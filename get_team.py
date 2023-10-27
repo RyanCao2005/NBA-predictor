@@ -82,4 +82,3 @@ def get_team():
   df['team'] = df['team'].apply(extract_team_from_dict)
 
   return df
-get_team()
