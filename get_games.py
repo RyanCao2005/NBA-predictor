@@ -21,7 +21,6 @@ def get_player_id(player_name, df):
 
 def get_games(player_name=None, player_id = None):
     #takes playername or playerid and returns df of games 
-    
     if player_name:
         player_id = int(get_player_id(player_name,player_ids)[0])
     if not player_id:
@@ -34,6 +33,7 @@ def get_games(player_name=None, player_id = None):
         'Referer': 'https://bucketlist.fans/',
         'Content-Type': 'application/json'
     }
+
     player_response = requests.post(url, headers=headers, json = payload)
-    f = json.loads(player_response.text)
-    return pd.DataFrame(f)
+    h = json.loads(player_response.text)
+    return pd.DataFrame(h)
