@@ -17,7 +17,24 @@ def get_player_and_date(game_id, dataframe):
 
     return np.array([players, dateDF], dtype=object)
 
-def priorAverages(game_id):
+
+"""
+    priorAverages:
+        Get's all of the players from the game_id and all the games those players were in
+        before that game, it combines all of their stats ['id' ... 'pts'] and averages it,
+        then puts it into a 2D array of the games and the player averages (for some reason
+        25).
+        
+    Args:
+        game_id (integer): The game id that we want to pick.
+        param2 (data frame): The data frame of the CSV (Should be normalized)
+
+    Returns:
+        return_type: Description of the return value.
+            player_averages_array (data frame): The game id that we want to pick.
+            hometeam_win (boolean): If the home team won for the specificed game_id.
+    """
+def priorAverages(game_id, playerstats_df):
     # Get the list of players and the date for the given game_id
     players, date_df = get_player_and_date(game_id,playerstats_df)
 
