@@ -12,10 +12,12 @@ df3 = pd.read_csv('stats10726.csv')
 # List of columns to fill NaN with 0 and normalize
 columns_to_normalize = ['ast', 'blk', 'dreb', 'fg3_pct', 'fg3a', 'fg3m', 'fg_pct', 'fga', 'fgm',
                          'ft_pct', 'fta', 'ftm', 'min', 'oreb', 'pf', 'pts', 'reb', 'stl',
-                         'turnover', 'player.height_feet', 'player.height_inches', 'player.weight_pounds']
+                         'turnover', 'game.home_team_score', 'game.visitor_team_score', 'player.height_feet', 'player.height_inches', 'player.weight_pounds']
 
 # Filling NaN values with 0 and converting all columns to numeric
-df[columns_to_normalize] = df[columns_to_normalize].apply(pd.to_numeric, errors='coerce').fillna(0)
+df1[columns_to_normalize] = df1[columns_to_normalize].apply(pd.to_numeric, errors='coerce').fillna(0)
+df2[columns_to_normalize] = df2[columns_to_normalize].apply(pd.to_numeric, errors='coerce').fillna(0)
+df3[columns_to_normalize] = df3[columns_to_normalize].apply(pd.to_numeric, errors='coerce').fillna(0)
 
 # Defining the normalization function
 def normalize_column(df, column_name):
@@ -37,10 +39,10 @@ def normalize_column(df, column_name):
 
 # Apply normalization to each column in the list
 for column in columns_to_normalize:
-    df1 = normalize_column(df, column)
-    df2 = normalize_column(df, column)
-    df3 = normalize_column(df, column)
+    df1 = normalize_column(df1, column)
+    df2 = normalize_column(df2, column)
+    df3 = normalize_column(df3, column)
 
 # Saving the normalized DataFrame to a new CSV file after merging
 result_df = pd.concat([df1, df2, df3], ignore_index=True)
-result_df.to_csv('normalized_data.csv', index=False)
+result_df.to_csv('actually_normalized_data.csv', index=False)
