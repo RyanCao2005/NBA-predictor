@@ -7,6 +7,8 @@ import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
 
 # Assuming you have loaded the player data
 player_data = pd.read_csv('actually_normalized_data.csv') 
@@ -23,13 +25,18 @@ player_data = player_data.dropna(subset=[target_statistic])
 X = player_data[selected_features]
 y = player_data[target_statistic]
 
+# Normalize/Standardize the features
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
 # Split the dataset into training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
 
 # Define a PyTorch Dataset for player stats prediction
 class PlayerDataset(Dataset):
     def __init__(self, features, targets):
-        self.features = torch.tensor(features.values, dtype=torch.float32)
+        self.features = torch.tensor(features, dtype=torch.float32)
         self.targets = torch.tensor(targets.values, dtype=torch.float32).view(-1, 1)
 
     def __len__(self):
@@ -58,13 +65,13 @@ class PlayerStatsPredictor(nn.Module):
         x = self.fc2(x)
         return x
 
-# Instantiate the player stats predictor model
+# Instantiate the model
 input_size = len(selected_features)
 hidden_size = 64
 output_size = 1
 player_model = PlayerStatsPredictor(input_size, hidden_size, output_size)
 
-# Define loss function and optimizer
+# Loss function and optimizer
 criterion = nn.MSELoss()
 optimizer = optim.Adam(player_model.parameters(), lr=0.001)
 
@@ -93,21 +100,20 @@ with torch.no_grad():
         all_predictions.extend(predictions.numpy())
         all_targets.extend(targets.numpy())
 
-# Calculate Mean Squared Error on the test set
+# Calculate MSE on the test set
 mse = mean_squared_error(all_targets, all_predictions)
 print(f'Mean Squared Error on Test Set: {mse:.4f}')
 
-# Example: Predicting player statistics for a given player
+# Predict player stats
 def predict_player_stats(player_name, selected_features, player_model):
     player_names = player_name.split()
-    player_features = player_data[(player_data['player.first_name'] == player_names[0]) &(player_data['player.last_name'] == player_names[1])][selected_features].values    
+    player_features = player_data[(player_data['player.first_name'] == player_names[0]) &
+                                  (player_data['player.last_name'] == player_names[1])][selected_features].values
     player_features_tensor = torch.tensor(player_features, dtype=torch.float32)
     player_model.eval()
     with torch.no_grad():
         predicted_stat = player_model(player_features_tensor)
-    predicted_stat = predicted_stat.numpy()
-    return predicted_stat
+    return predicted_stat.numpy()[0][0]
 
 predicted_stats = predict_player_stats('LeBron James', selected_features, player_model)
-print(f'Predicted Stats for LeBron James: {predicted_stats[0][0]:.2f}')
- 
+print(f'Predicted Stats for LeBron James: {predicted_stats:.2f}')
